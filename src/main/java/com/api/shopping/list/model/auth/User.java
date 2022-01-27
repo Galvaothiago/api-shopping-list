@@ -1,7 +1,9 @@
 package com.api.shopping.list.model.auth;
 
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 public class User implements Serializable {
 	private static final long serialVersionUID = 1L;
@@ -12,12 +14,13 @@ public class User implements Serializable {
 	private String email;
 	private String password;
 	
+	private Set<Role> roles = new HashSet<>();
+	
 	public User() {
 		
 	}
 
 	public User(Long id, String firstName, String lastName, String email, String password) {
-		super();
 		this.id = id;
 		this.firstName = firstName;
 		this.lastName = lastName;
