@@ -15,6 +15,7 @@ public class Purchase implements Serializable {
 	private Instant createdAt;
 	private Double totalPrice;
 	private User user;
+	private EStatus status;
 	private List<String> items;
 	
 	public Purchase() {
@@ -22,7 +23,6 @@ public class Purchase implements Serializable {
 	}
 	
 	public Purchase(Long id, String title, Instant createdAt, Double totalPrice, User user, List<String> items) {
-		super();
 		this.id = id;
 		this.title = title;
 		this.createdAt = createdAt;
