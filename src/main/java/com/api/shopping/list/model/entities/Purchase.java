@@ -20,6 +20,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import com.api.shopping.list.model.auth.User;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "purchases")
@@ -31,9 +32,10 @@ public class Purchase implements Serializable {
 	private Long id;
 
 	private String title;
-	private Instant createdAt;
-	private Double totalPrice;
+	private Instant createdAt = Instant.now();
+	private Double totalPrice = 0.00D;
 	
+	@JsonIgnore
 	@ManyToOne
 	@JoinColumn(name = "users_id", nullable = false)
 	private User user;
@@ -50,11 +52,9 @@ public class Purchase implements Serializable {
 		
 	}
 	
-	public Purchase(Long id, String title, Instant createdAt, Double totalPrice, User user, List<String> items) {
+	public Purchase(Long id, String title, User user, List<String> items) {
 		this.id = id;
 		this.title = title;
-		this.createdAt = createdAt;
-		this.totalPrice = totalPrice;
 		this.user = user;
 		this.items = items;
 	}
