@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 import com.api.shopping.list.controllers.AuthController;
 import com.api.shopping.list.exceptions.PurchaseItemNotExistsException;
 import com.api.shopping.list.exceptions.PurchaseNotFoundException;
-import com.api.shopping.list.exceptions.PurchaseUnmatchedUser;
+import com.api.shopping.list.exceptions.PurchaseUnmatchedUserException;
 import com.api.shopping.list.model.auth.User;
 import com.api.shopping.list.model.entities.Purchase;
 import com.api.shopping.list.repositories.PurchaseRepository;
@@ -68,7 +68,7 @@ public class PurchaseService {
 			Boolean isYourPurchase = user.getId() == purchase.get().getUser().getId();
 			
 			if(!isYourPurchase) {
-				throw new PurchaseUnmatchedUser("This item does not belong to your purchase");
+				throw new PurchaseUnmatchedUserException("This item does not belong to your purchase");
 			}
 			
 			List<String> items = purchase.get().getItems();
