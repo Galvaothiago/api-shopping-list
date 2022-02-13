@@ -1,13 +1,19 @@
 package com.api.shopping.list.security.jwt;
 
 import java.util.Date;
+import java.util.Optional;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
+import com.api.shopping.list.model.auth.User;
+import com.api.shopping.list.repositories.UserRepository;
 import com.api.shopping.list.security.services.UserDetailsImpl;
 
 import io.jsonwebtoken.ExpiredJwtException;
@@ -27,6 +33,9 @@ public class JwtUtils {
 
 	@Value("${purchase.app.jwtExpirationMs}")
 	private int jwtExpirationMs;
+	
+	@Autowired
+	UserRepository userRepository;
 	
 	public String generateJwtToken(Authentication authentication) {
 		UserDetailsImpl userPrincipal = (UserDetailsImpl) authentication.getPrincipal();
@@ -67,6 +76,23 @@ public class JwtUtils {
 		}
 		
 		return false;
+	}
+	
+	public User getUserByToken(HttpServletRequest request) {
+		  String[] headerAuth = request.getHeader("Authorization").split(" ");
+		  String token = headerAuth[1];
+		  
+		  if(!this.validateJwtToken(token)) {
+			  return null;
+		  }
+		  
+		  Optional<User> user = userRepository.findByEmail(this.getUserNameFromJwtToken(token));
+		  
+		  if(!user.isPresent()) {
+			  return null;
+		  }
+		  
+		  return user.get();
 	}
 
 }

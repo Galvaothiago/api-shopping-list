@@ -2,7 +2,7 @@ package com.api.shopping.list.payload.response;
 
 import java.util.List;
 
-public class JwtReponse {
+public class JwtResponse {
 	private String token;
 	private String type = "Bearer";
 	private String refreshToken;
@@ -12,7 +12,7 @@ public class JwtReponse {
 	private String email;
 	private List<String> roles;
 	
-	public JwtReponse(String token, String refreshToken, Long id, String firstName, String lastName, String email,
+	public JwtResponse(String token, String refreshToken, Long id, String firstName, String lastName, String email,
 			List<String> roles) {
 
 		this.token = token;
