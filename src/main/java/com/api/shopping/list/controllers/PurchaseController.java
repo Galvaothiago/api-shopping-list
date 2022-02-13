@@ -82,13 +82,12 @@ public class PurchaseController {
 	public ResponseEntity<MessageResponse> deleteItems(@PathVariable Long id, @PathVariable String toRemove, HttpServletRequest request) {
 		User user = jwtUtils.getUserByToken(request);
 		
-		boolean wasDeleted = service.deleteItems(id, toRemove, user);
+		service.deleteItems(id, toRemove, user);
 		
-		if(wasDeleted) {
-			return ResponseEntity.ok(new MessageResponse("Items deleted successfully!"));
-		}
+		return ResponseEntity.ok(new MessageResponse("Items deleted successfully!"));
 		
-		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponse("You can't delete that purchase. It's not yours"));
+		
+//		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponse("You can't delete that purchase. It's not yours"));
 	}
 	
 }

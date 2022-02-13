@@ -1,6 +1,7 @@
 package com.api.shopping.list.services;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import org.slf4j.Logger;
@@ -9,6 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.api.shopping.list.controllers.AuthController;
+import com.api.shopping.list.exceptions.PurchaseItemNotExistsException;
+import com.api.shopping.list.exceptions.PurchaseNotFoundException;
+import com.api.shopping.list.exceptions.PurchaseUnmatchedUser;
 import com.api.shopping.list.model.auth.User;
 import com.api.shopping.list.model.entities.Purchase;
 import com.api.shopping.list.repositories.PurchaseRepository;
@@ -57,32 +61,32 @@ public class PurchaseService {
 		return null;
 	}
 	
-	public boolean deleteItems(Long id, String toRemove, User user) {
+	public void deleteItems(Long id, String toRemove, User user) {
 		try {
 			Optional<Purchase> purchase = repository.findById(id);
 			
 			Boolean isYourPurchase = user.getId() == purchase.get().getUser().getId();
 			
-			if(purchase.isEmpty()) {
-				// throw error here
+			if(!isYourPurchase) {
+				throw new PurchaseUnmatchedUser("This item does not belong to your purchase");
 			}
 			
-			if(isYourPurchase) {
-				List<String> items = purchase.get().getItems();
-				
-				int index = items.indexOf(toRemove);
-				items.remove(index);
-				
-				System.out.println(items);
-				repository.save(purchase.get());
-				return true;
-			}
+			List<String> items = purchase.get().getItems();
 			
-			return false;
+			int index = items.indexOf(toRemove);
+			items.remove(index);
+			
+			System.out.println(items);
+			repository.save(purchase.get());
 			
 		} catch(IndexOutOfBoundsException e) {
-			logger.error("");
-			return false;
+			throw new PurchaseItemNotExistsException(
+						String.format("item - %s not found in this purchase", toRemove)
+					);
+		} catch(NoSuchElementException e) {
+			throw new PurchaseNotFoundException(
+						String.format("Purchase with the id %d not found", id)
+					); 
 		}
  	}
 	
