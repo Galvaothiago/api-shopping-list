@@ -18,6 +18,9 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.PositiveOrZero;
+import javax.validation.constraints.Size;
 
 import com.api.shopping.list.model.auth.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -31,8 +34,11 @@ public class Purchase implements Serializable {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
+	@Size(max = 100)
 	private String title;
 	private Instant createdAt = Instant.now();
+	
+	@PositiveOrZero
 	private Double totalPrice = 0.00D;
 	
 	@JsonIgnore
@@ -42,7 +48,7 @@ public class Purchase implements Serializable {
 	
 	@Enumerated(EnumType.STRING)
 	@Column(length = 25)
-	private EStatus status = EStatus.CREATED;
+	private EStatus status;
 	
 	@ElementCollection
 	@CollectionTable(name = "purchases_items", joinColumns = @JoinColumn(name = "purchase_id"))
@@ -55,6 +61,7 @@ public class Purchase implements Serializable {
 	public Purchase(Long id, String title, List<String> items) {
 		this.id = id;
 		this.title = title;
+		this.status = EStatus.CREATED;
 		this.items = items;
 	}
 
@@ -80,6 +87,14 @@ public class Purchase implements Serializable {
 
 	public void setCreatedAt(Instant createdAt) {
 		this.createdAt = createdAt;
+	}
+	
+	public EStatus getStatus() {
+		return status;
+	}
+	
+	public void setStatus(EStatus status) {
+		this.status = status;
 	}
 
 	public Double getTotalPrice() {

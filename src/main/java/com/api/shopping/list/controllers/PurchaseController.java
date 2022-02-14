@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -50,7 +51,7 @@ public class PurchaseController {
 	}
 	
 	@PostMapping
-	public ResponseEntity<Purchase> savePurchase(@RequestBody Purchase purchase, HttpServletRequest request) {
+	public ResponseEntity<Purchase> savePurchase(@Valid @RequestBody Purchase purchase, HttpServletRequest request) {
 		User user = jwtUtils.getUserByToken(request);
 		
 		if(user == null) {
@@ -69,14 +70,14 @@ public class PurchaseController {
 	}
 	
 	@PutMapping(value = "/{id}")
-	public ResponseEntity<Purchase> updatePurchase(@PathVariable Long id, @RequestBody Purchase purchase) {
+	public ResponseEntity<Purchase> updatePurchase(@Valid @PathVariable Long id, @RequestBody Purchase purchase) {
 		Purchase updatedPurchase = service.updateById(id, purchase);
 		
 		return ResponseEntity.ok().body(updatedPurchase);
 	}
 	
 	@PutMapping(value = "/items/{id}")
-	public ResponseEntity<Purchase> saveItemIntoPurchase(@PathVariable Long id, @RequestBody List<String> items) {
+	public ResponseEntity<Purchase> saveItemIntoPurchase(@Valid @PathVariable Long id, @RequestBody List<String> items) {
 		Purchase updatedPurchase = service.insertItems(id, items);
 		
 		if(updatedPurchase == null) ResponseEntity.notFound();
@@ -84,8 +85,19 @@ public class PurchaseController {
 		return ResponseEntity.ok(updatedPurchase);
 	}
 	
+	@PutMapping(value = "/checkout/{id}/{value}")
+	public ResponseEntity<?> finalizePurchase(@PathVariable Long id, @PathVariable Double value, HttpServletRequest request) {
+		User user = jwtUtils.getUserByToken(request);
+		
+		service.finalizePurchase(id, value, user);
+		
+		return ResponseEntity.ok().body(
+					new MessageResponse("Your purchase was finalized successfully!")
+				);
+	}
+	
 	@DeleteMapping(value = "/items/{id}/{toRemove}")
-	public ResponseEntity<MessageResponse> deleteItems(@PathVariable Long id, @PathVariable String toRemove, HttpServletRequest request) {
+	public ResponseEntity<MessageResponse> deleteItems(@Valid @PathVariable Long id, @PathVariable String toRemove, HttpServletRequest request) {
 		User user = jwtUtils.getUserByToken(request);
 		
 		service.deleteItems(id, toRemove, user);

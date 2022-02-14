@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
+import javax.transaction.Transactional;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +16,7 @@ import com.api.shopping.list.exceptions.PurchaseItemNotExistsException;
 import com.api.shopping.list.exceptions.PurchaseNotFoundException;
 import com.api.shopping.list.exceptions.PurchaseUnmatchedUserException;
 import com.api.shopping.list.model.auth.User;
+import com.api.shopping.list.model.entities.EStatus;
 import com.api.shopping.list.model.entities.Purchase;
 import com.api.shopping.list.repositories.PurchaseRepository;
 
@@ -93,6 +96,31 @@ public class PurchaseService {
 	public void update(Purchase entity, Purchase purchase) {
 		entity.setTitle(purchase.getTitle());
 		entity.setTotalPrice(purchase.getTotalPrice());
+	}
+	
+	@Transactional
+	public void finalizePurchase(Long id, Double value, User user) {
+		try {
+			
+			Optional<Purchase> purchaseOptional = repository.findById(id);
+			Purchase purchase = purchaseOptional.get();
+			
+			Boolean isYourPurchase = user.getId() == purchase.getUser().getId();
+			
+			if(!isYourPurchase) {
+				throw new PurchaseUnmatchedUserException("This item does not belong to your purchase");
+			}
+			
+			purchase.setTotalPrice(value);
+			purchase.setStatus(EStatus.FINISHED);
+			
+			repository.save(purchase);
+			
+		} catch(NoSuchElementException e) {
+			throw new PurchaseNotFoundException(
+					String.format("Purchase with the id %d not found", id)
+				);
+		}
 	}
 	
 	public Purchase insertItems(Long id, List<String> items) {
