@@ -23,8 +23,6 @@ import com.api.shopping.list.repositories.PurchaseRepository;
 @Service
 public class PurchaseService {
 	
-	private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
-	
 	@Autowired
 	PurchaseRepository repository;
 	
