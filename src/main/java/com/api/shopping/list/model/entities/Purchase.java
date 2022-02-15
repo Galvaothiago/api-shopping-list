@@ -48,7 +48,7 @@ public class Purchase implements Serializable {
 	
 	@Enumerated(EnumType.STRING)
 	@Column(length = 25)
-	private EStatus status;
+	private EStatus status = EStatus.CREATED;
 	
 	@ElementCollection
 	@CollectionTable(name = "purchases_items", joinColumns = @JoinColumn(name = "purchase_id"))
@@ -61,7 +61,7 @@ public class Purchase implements Serializable {
 	public Purchase(Long id, String title, List<String> items) {
 		this.id = id;
 		this.title = title;
-		this.status = EStatus.CREATED;
+//		this.status = EStatus.CREATED;
 		this.items = items;
 	}
 

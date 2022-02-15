@@ -63,22 +63,32 @@ public class PurchaseController {
 	}
 	
 	@GetMapping(value = "/{id}")
-	public ResponseEntity<Purchase> getById(@PathVariable Long id) {
-		Purchase purchase = service.findById(id);
+	public ResponseEntity<Purchase> getById(@PathVariable Long id, HttpServletRequest request) {
+		User user = jwtUtils.getUserByToken(request);
 		
+		Purchase purchase = service.findById(id, user);
+		
+		if(purchase == null) ResponseEntity.notFound();
+		
+		System.out.println(purchase);
 		return ResponseEntity.ok().body(purchase);
 	}
 	
 	@PutMapping(value = "/{id}")
-	public ResponseEntity<Purchase> updatePurchase(@Valid @PathVariable Long id, @RequestBody Purchase purchase) {
-		Purchase updatedPurchase = service.updateById(id, purchase);
+	public ResponseEntity<Purchase> updatePurchase(@Valid @PathVariable Long id, @RequestBody Purchase purchase, HttpServletRequest request) {
+		User user = jwtUtils.getUserByToken(request);
+		
+		Purchase updatedPurchase = service.updateById(id, purchase, user);
 		
 		return ResponseEntity.ok().body(updatedPurchase);
 	}
 	
 	@PutMapping(value = "/items/{id}")
-	public ResponseEntity<Purchase> saveItemIntoPurchase(@Valid @PathVariable Long id, @RequestBody List<String> items) {
-		Purchase updatedPurchase = service.insertItems(id, items);
+	public ResponseEntity<Purchase> saveItemIntoPurchase(@Valid @PathVariable Long id, @RequestBody List<String> items, HttpServletRequest request) {
+		User user = jwtUtils.getUserByToken(request);
+		
+		Purchase updatedPurchase = service.insertItems(id, items, user);
+		
 		
 		if(updatedPurchase == null) ResponseEntity.notFound();
 		
@@ -141,7 +151,6 @@ public class PurchaseController {
 		
 		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorMessage);
 	}
-	
 	
 }
 

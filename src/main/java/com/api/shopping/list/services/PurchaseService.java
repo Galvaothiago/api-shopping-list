@@ -40,20 +40,24 @@ public class PurchaseService {
 		return result;
 	}
 	
-	public Purchase findById(Long id) {
+	public Purchase findById(Long id, User user) {
 		Optional<Purchase> result = repository.findById(id);
 		
-		if(result.isPresent()) {
+		boolean isYourPurchase = user.equals(result.get().getUser());
+		
+		if(result.isPresent() && isYourPurchase) {
 			return result.get();
 		}
 		
 		return null;
 	}
 	
-	public Purchase updateById(Long id, Purchase purchase) {
+	public Purchase updateById(Long id, Purchase purchase, User user) {
 		Optional<Purchase> result = repository.findById(id);
 		
-		if(result.isPresent()) {
+		boolean isYourPurchase = user.equals(result.get().getUser());
+		
+		if(result.isPresent() && isYourPurchase) {
 			update(result.get(), purchase);
 			
 			return result.get();
@@ -121,26 +125,34 @@ public class PurchaseService {
 		}
 	}
 	
-	public Purchase insertItems(Long id, List<String> items) {
-		Optional<Purchase> purchase = repository.findById(id);
-		
-		if(!purchase.isPresent()) {
-			return null;
-		}
-		
-		Purchase entity = purchase.get();
-		
-		if(entity.getItems().isEmpty()) {
-			entity.setItems(items);
+	public Purchase insertItems(Long id, List<String> items, User user) {
+		try {
+			Optional<Purchase> purchase = repository.findById(id);
+			Purchase entity = purchase.get();
 			
+			Boolean isYourPurchase = user.equals(entity.getUser()); 
+			
+			if(!isYourPurchase) {
+				throw new PurchaseUnmatchedUserException("This item does not belong to your purchase");
+			}
+			
+			if(entity.getItems().isEmpty()) {
+				entity.setItems(items);
+				
+				return repository.save(entity);
+			} 
+				
+			for(String item : items) {
+				entity.getItems().add(item);
+			}
+				
 			return repository.save(entity);
+				
+		}catch(PurchaseItemNotExistsException e) {
+			throw new PurchaseNotFoundException(
+					String.format("Purchase with the id %d not found", id)
+				);
 		}
-		
-		for(String item : items) {
-			entity.getItems().add(item);
-		}
-		
-		return repository.save(entity);
 	}
 	
 	public void delete(Long id) {
