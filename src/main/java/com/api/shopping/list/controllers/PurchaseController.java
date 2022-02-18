@@ -116,6 +116,14 @@ public class PurchaseController {
 		
 	}
 	
+	@DeleteMapping(value = "/{id}")
+	public ResponseEntity<?> deletePurchase(@PathVariable Long id, HttpServletRequest request) {
+		User user = jwtUtils.getUserByToken(request);
+		service.deletePurchase(id, user);
+		
+		return ResponseEntity.ok().body(new MessageResponse("your purchase was deleted!"));
+	}
+	
 	@ExceptionHandler(PurchaseNotFoundException.class)
 	public ResponseEntity<?> PurchaseNotFoundException(PurchaseNotFoundException e) {
 		PurchaseErrorMessage errorMessage = new PurchaseErrorMessage();

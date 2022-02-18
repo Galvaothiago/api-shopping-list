@@ -7,8 +7,6 @@ import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -38,7 +36,6 @@ import com.api.shopping.list.security.services.UserDetailsImpl;
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
-	private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
 	
 	@Autowired
 	AuthenticationManager authenticationManager;
@@ -80,7 +77,6 @@ public class AuthController {
 																userDetails.getLastName(),
 																userDetails.getEmail(),
 																roles));
-		
 	}
 	
 	@PostMapping("/signup")
@@ -89,7 +85,7 @@ public class AuthController {
 		if (userRepository.existsByEmail(signUpRequest.getEmail())) {
 			return ResponseEntity
 					.badRequest()
-					.body(new MessageResponse("Error: Email is already in use!"));
+					.body(new MessageResponse("Email is already in use!"));
 		}
 
 		// Create new user's account

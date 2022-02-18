@@ -18,9 +18,11 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import javax.validation.constraints.NotBlank;
+import javax.validation.Valid;
 import javax.validation.constraints.PositiveOrZero;
 import javax.validation.constraints.Size;
+
+import org.hibernate.annotations.CreationTimestamp;
 
 import com.api.shopping.list.model.auth.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -36,7 +38,9 @@ public class Purchase implements Serializable {
 
 	@Size(max = 100)
 	private String title;
-	private Instant createdAt = Instant.now();
+	
+	@CreationTimestamp
+	private Instant createdAt;
 	
 	@PositiveOrZero
 	private Double totalPrice = 0.00D;
@@ -50,6 +54,7 @@ public class Purchase implements Serializable {
 	@Column(length = 25)
 	private EStatus status = EStatus.CREATED;
 	
+	@Valid
 	@ElementCollection
 	@CollectionTable(name = "purchases_items", joinColumns = @JoinColumn(name = "purchase_id"))
 	private List<String> items = new ArrayList<>();
@@ -61,7 +66,6 @@ public class Purchase implements Serializable {
 	public Purchase(Long id, String title, List<String> items) {
 		this.id = id;
 		this.title = title;
-//		this.status = EStatus.CREATED;
 		this.items = items;
 	}
 

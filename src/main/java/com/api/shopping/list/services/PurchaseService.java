@@ -6,12 +6,10 @@ import java.util.Optional;
 
 import javax.transaction.Transactional;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
-import com.api.shopping.list.controllers.AuthController;
 import com.api.shopping.list.exceptions.PurchaseItemNotExistsException;
 import com.api.shopping.list.exceptions.PurchaseNotFoundException;
 import com.api.shopping.list.exceptions.PurchaseUnmatchedUserException;
@@ -155,7 +153,21 @@ public class PurchaseService {
 		}
 	}
 	
-	public void delete(Long id) {
-		repository.deleteById(id);
+	public void deletePurchase(Long id, User user) {
+		Optional<Purchase> purchase = repository.findById(id);
+			
+		if(purchase.isEmpty()) {
+			throw new PurchaseNotFoundException(
+					String.format("Purchase with the id %d not found", id)
+					);
+		}
+		
+		Boolean isYourPurchase = user.equals(purchase.get().getUser());
+			
+		if(isYourPurchase) {
+			repository.deleteById(id);				
+		} else {
+			throw new PurchaseUnmatchedUserException("You can't delete this purchase");
+		}
 	}
 }
