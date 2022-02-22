@@ -27,7 +27,6 @@ public class PurchaseService {
 	public List<Purchase> getAllPurchase(User user) {
 		List<Purchase> purchases = repository.findAllPurchaseByUser(user.getId());
 		
-		System.out.println(user.getId());
 		return purchases;
 	}
 	

@@ -8,7 +8,6 @@ import org.springframework.data.jpa.repository.Query;
 import com.api.shopping.list.model.entities.Purchase;
 
 public interface PurchaseRepository extends JpaRepository<Purchase, Long>{
-	@Query(value = "SELECT * FROM purchases WHERE users_id = :id", 
-			nativeQuery = true)
+	@Query(value = "select p from Purchase p inner join p.user u on u.id = :id")
 	List<Purchase> findAllPurchaseByUser(Long id);
 }

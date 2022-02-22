@@ -26,6 +26,7 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import com.api.shopping.list.model.auth.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
 @Table(name = "purchases")
@@ -53,7 +54,7 @@ public class Purchase implements Serializable {
 	@Enumerated(EnumType.STRING)
 	@Column(length = 25)
 	private EStatus status = EStatus.CREATED;
-	
+
 	@Valid
 	@ElementCollection
 	@CollectionTable(name = "purchases_items", joinColumns = @JoinColumn(name = "purchase_id"))

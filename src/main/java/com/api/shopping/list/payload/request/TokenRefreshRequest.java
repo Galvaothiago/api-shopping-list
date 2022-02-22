@@ -1,15 +1,15 @@
 package com.api.shopping.list.payload.request;
 
-public class TokenRefreshResponse {
+public class TokenRefreshRequest {
 	private String accessToken;
 	private String refreshToken;
 	private String tokenType = "Bearer";
 	
-	public TokenRefreshResponse() {
+	public TokenRefreshRequest() {
 		
 	}
 	
-	public TokenRefreshResponse(String accessToken, String refreshToken) {
+	public TokenRefreshRequest(String accessToken, String refreshToken) {
 		this.accessToken = accessToken;
 	    this.refreshToken = refreshToken;
 	}

@@ -24,11 +24,13 @@ import com.api.shopping.list.model.auth.RefreshToken;
 import com.api.shopping.list.model.auth.Role;
 import com.api.shopping.list.model.auth.User;
 import com.api.shopping.list.payload.request.LoginRequest;
-import com.api.shopping.list.payload.request.MessageResponse;
 import com.api.shopping.list.payload.request.SignupRequest;
+import com.api.shopping.list.payload.request.TokenRefreshRequest;
 import com.api.shopping.list.payload.response.JwtResponse;
+import com.api.shopping.list.payload.response.MessageResponse;
 import com.api.shopping.list.repositories.RoleRepository;
 import com.api.shopping.list.repositories.UserRepository;
+import com.api.shopping.list.security.exceptions.TokenRefreshException;
 import com.api.shopping.list.security.jwt.JwtUtils;
 import com.api.shopping.list.security.services.RefreshTokenService;
 import com.api.shopping.list.security.services.UserDetailsImpl;
@@ -123,4 +125,19 @@ public class AuthController {
 
 		return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
 	}
+	
+	@PostMapping("/refreshtoken")
+	  public ResponseEntity<?> refreshtoken(@Valid @RequestBody TokenRefreshRequest request) {
+	    String requestRefreshToken = request.getRefreshToken();
+
+	    return refreshTokenService.findByToken(requestRefreshToken)
+	        .map(refreshTokenService::verifyExpiration)
+	        .map(RefreshToken::getUser)
+	        .map(user -> {
+	          String token = jwtUtils.generateTokenFromUsername(user.getEmail());
+	          return ResponseEntity.ok(new TokenRefreshRequest(token, requestRefreshToken));
+	        })
+	        .orElseThrow(() -> new TokenRefreshException(requestRefreshToken,
+	            "Refresh token is not in database!"));
+	  }
 }

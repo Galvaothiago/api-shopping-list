@@ -24,7 +24,7 @@ import com.api.shopping.list.exceptions.PurchaseNotFoundException;
 import com.api.shopping.list.exceptions.PurchaseUnmatchedUserException;
 import com.api.shopping.list.model.auth.User;
 import com.api.shopping.list.model.entities.Purchase;
-import com.api.shopping.list.payload.request.MessageResponse;
+import com.api.shopping.list.payload.response.MessageResponse;
 import com.api.shopping.list.payload.response.exception.PurchaseErrorMessage;
 import com.api.shopping.list.security.jwt.JwtUtils;
 import com.api.shopping.list.services.PurchaseService;
@@ -44,9 +44,6 @@ public class PurchaseController {
 		
 		List<Purchase> purchases = service.getAllPurchase(user);
 		
-		if(user == null) {
-			return null;
-		}
 		return 	ResponseEntity.ok().body(purchases);
 	}
 	
