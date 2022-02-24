@@ -22,10 +22,12 @@ import org.springframework.web.bind.annotation.RestController;
 import com.api.shopping.list.exceptions.PurchaseItemNotExistsException;
 import com.api.shopping.list.exceptions.PurchaseNotFoundException;
 import com.api.shopping.list.exceptions.PurchaseUnmatchedUserException;
+import com.api.shopping.list.exceptions.TokenException;
 import com.api.shopping.list.model.auth.User;
 import com.api.shopping.list.model.entities.Purchase;
 import com.api.shopping.list.payload.response.MessageResponse;
 import com.api.shopping.list.payload.response.exception.PurchaseErrorMessage;
+import com.api.shopping.list.payload.response.exception.TokenExceptionResponse;
 import com.api.shopping.list.security.jwt.JwtUtils;
 import com.api.shopping.list.services.PurchaseService;
 
@@ -150,6 +152,17 @@ public class PurchaseController {
 		PurchaseErrorMessage errorMessage = new PurchaseErrorMessage();
 		
 		errorMessage.setTimestamp(Instant.now());
+		errorMessage.setMessage(e.getReason());
+		errorMessage.setStatus(e.getStatus().value());
+		errorMessage.setError(e.getMessage());
+		
+		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorMessage);
+	}
+	
+	@ExceptionHandler(TokenException.class)
+	public ResponseEntity<?> TokenException(TokenException e) {
+		TokenExceptionResponse errorMessage = new TokenExceptionResponse();
+		
 		errorMessage.setMessage(e.getReason());
 		errorMessage.setStatus(e.getStatus().value());
 		errorMessage.setError(e.getMessage());
