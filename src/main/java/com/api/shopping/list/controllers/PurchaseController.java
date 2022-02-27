@@ -159,17 +159,6 @@ public class PurchaseController {
 		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorMessage);
 	}
 	
-	@ExceptionHandler(TokenException.class)
-	public ResponseEntity<?> TokenException(TokenException e) {
-		TokenExceptionResponse errorMessage = new TokenExceptionResponse();
-		
-		errorMessage.setMessage(e.getReason());
-		errorMessage.setStatus(e.getStatus().value());
-		errorMessage.setError(e.getMessage());
-		
-		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorMessage);
-	}
-	
 }
 
 
