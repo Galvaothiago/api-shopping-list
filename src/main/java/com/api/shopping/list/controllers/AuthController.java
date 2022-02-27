@@ -8,17 +8,20 @@ import java.util.stream.Collectors;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.api.shopping.list.exceptions.TokenException;
 import com.api.shopping.list.model.auth.ERole;
 import com.api.shopping.list.model.auth.RefreshToken;
 import com.api.shopping.list.model.auth.Role;
@@ -28,12 +31,16 @@ import com.api.shopping.list.payload.request.SignupRequest;
 import com.api.shopping.list.payload.request.TokenRefreshRequest;
 import com.api.shopping.list.payload.response.JwtResponse;
 import com.api.shopping.list.payload.response.MessageResponse;
+import com.api.shopping.list.payload.response.exception.InvalidPasswordPolicyResponse;
+import com.api.shopping.list.payload.response.exception.TokenExceptionResponse;
 import com.api.shopping.list.repositories.RoleRepository;
 import com.api.shopping.list.repositories.UserRepository;
 import com.api.shopping.list.security.exceptions.TokenRefreshException;
+import com.api.shopping.list.security.exceptions.ValidatePolicyPasswordException;
 import com.api.shopping.list.security.jwt.JwtUtils;
 import com.api.shopping.list.security.services.RefreshTokenService;
 import com.api.shopping.list.security.services.UserDetailsImpl;
+import com.api.shopping.list.security.services.ValidatePolicyPassword;
 
 @RestController
 @RequestMapping("/auth")
@@ -84,12 +91,25 @@ public class AuthController {
 	@PostMapping("/signup")
 	public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
 
+		var validatePassword = new ValidatePolicyPassword(signUpRequest.getPassword());
+		
+		
+		boolean isValid = validatePassword.validate();
+		
+		if(!isValid) {
+			validatePassword.brokenRulesMessagens();
+			throw new ValidatePolicyPasswordException("Your password does not comply with the security policies",
+						validatePassword.getListRulesViolated()
+					);
+		}
+		
 		if (userRepository.existsByEmail(signUpRequest.getEmail())) {
 			return ResponseEntity
 					.badRequest()
 					.body(new MessageResponse("Email is already in use!"));
 		}
 
+		
 		// Create new user's account
 		User user = new User(signUpRequest.getFirstName(),
 								signUpRequest.getLastName(),
@@ -127,8 +147,8 @@ public class AuthController {
 	}
 	
 	@PostMapping("/refreshtoken")
-	  public ResponseEntity<?> refreshtoken(@Valid @RequestBody TokenRefreshRequest request) {
-	    String requestRefreshToken = request.getRefreshToken();
+	public ResponseEntity<?> refreshtoken(@Valid @RequestBody TokenRefreshRequest request) {
+		String requestRefreshToken = request.getRefreshToken();
 
 	    return refreshTokenService.findByToken(requestRefreshToken)
 	        .map(refreshTokenService::verifyExpiration)
@@ -139,5 +159,17 @@ public class AuthController {
 	        })
 	        .orElseThrow(() -> new TokenRefreshException(requestRefreshToken,
 	            "Refresh token is not in database!"));
-	  }
+	}
+	
+	@ExceptionHandler(ValidatePolicyPasswordException.class)
+	public ResponseEntity<?> ValidatePolicyPasswordException(ValidatePolicyPasswordException e) {
+		InvalidPasswordPolicyResponse errorMessage = new InvalidPasswordPolicyResponse();
+		
+		errorMessage.setMessage(e.getReason());
+		errorMessage.setStatus(e.getStatus().value());
+		errorMessage.setRulesBroken(e.getViolatedRules());
+		errorMessage.setQuantityRulesBroken(e.getViolatedRules().size());
+		
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
+	}
 }

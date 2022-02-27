@@ -36,8 +36,7 @@ public class testConfig implements CommandLineRunner{
 		items.add("Kit shampoo e condicionador");
 		items.add("2kg de carne moida");
 		items.add("8 paes frances");
-		
-		items.remove(1);
+	
 		
 		userRepository.save(user);
 		userRepository.save(user2);
