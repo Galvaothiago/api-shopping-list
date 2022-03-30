@@ -92,9 +92,13 @@ public class AuthController {
 	public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
 
 		var validatePassword = new ValidatePolicyPassword(signUpRequest.getPassword());
-		
-		
 		boolean isValid = validatePassword.validate();
+		
+		if (userRepository.existsByEmail(signUpRequest.getEmail())) {
+			return ResponseEntity
+					.badRequest()
+					.body(new MessageResponse("Email is already in use!"));
+		}
 		
 		if(!isValid) {
 			validatePassword.brokenRulesMessagens();
@@ -102,13 +106,6 @@ public class AuthController {
 						validatePassword.getListRulesViolated()
 					);
 		}
-		
-		if (userRepository.existsByEmail(signUpRequest.getEmail())) {
-			return ResponseEntity
-					.badRequest()
-					.body(new MessageResponse("Email is already in use!"));
-		}
-
 		
 		// Create new user's account
 		User user = new User(signUpRequest.getFirstName(),

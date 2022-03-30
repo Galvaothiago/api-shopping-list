@@ -78,7 +78,6 @@ public class PurchaseService {
 			int index = items.indexOf(toRemove);
 			items.remove(index);
 			
-			System.out.println(items);
 			repository.save(purchase.get());
 			
 		} catch(IndexOutOfBoundsException e) {

@@ -6,19 +6,19 @@ import java.util.List;
 public class InvalidPasswordPolicyResponse {
 	private int status;
 	private String message;
-	private int quantityRulesBroken;
-	private List<String> rulesBroken = new ArrayList<>();
+	private int quantityRulesViolated;
+	private List<String> rulesViolated = new ArrayList<>();
 	
 	public InvalidPasswordPolicyResponse() {
 		
 	}
 	
-	public InvalidPasswordPolicyResponse(int status, String message, int quantityRulesBroken,
+	public InvalidPasswordPolicyResponse(int status, String message, int quantityRulesViolated,
 			List<String> rulesBroken) {
 		this.status = status;
 		this.message = message;
-		this.quantityRulesBroken = quantityRulesBroken;
-		this.rulesBroken = rulesBroken;
+		this.quantityRulesViolated = quantityRulesViolated;
+		this.rulesViolated = rulesBroken;
 	}
 
 	public int getStatus() {
@@ -38,18 +38,18 @@ public class InvalidPasswordPolicyResponse {
 	}
 
 	public int getQuantityRulesBroken() {
-		return quantityRulesBroken;
+		return quantityRulesViolated;
 	}
 
-	public void setQuantityRulesBroken(int quantityRulesBroken) {
-		this.quantityRulesBroken = quantityRulesBroken;
+	public void setQuantityRulesBroken(int quantityRulesViolated) {
+		this.quantityRulesViolated = quantityRulesViolated;
 	}
 
 	public List<String> getRulesBroken() {
-		return rulesBroken;
+		return rulesViolated;
 	}
 
-	public void setRulesBroken(List<String> rulesBroken) {
-		this.rulesBroken = rulesBroken;
+	public void setRulesBroken(List<String> rulesViolated) {
+		this.rulesViolated = rulesViolated;
 	}
 }
