@@ -12,9 +12,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
-import com.api.shopping.list.exceptions.TokenException;
 import com.api.shopping.list.model.auth.User;
 import com.api.shopping.list.repositories.UserRepository;
+import com.api.shopping.list.security.exceptions.TokenException;
 import com.api.shopping.list.security.services.UserDetailsImpl;
 
 import io.jsonwebtoken.ExpiredJwtException;
@@ -65,16 +65,16 @@ public class JwtUtils {
 			return true;
 			
 		} catch (SignatureException e) {
-			logger.error("Invalid JWT signature: {}" + e.getMessage());
+			logger.error("Invalid JWT signature: " + e.getMessage());
 		} catch (MalformedJwtException e) {
-			logger.error("Ivalid JWT token: {}" + e.getMessage());
+			logger.error("Ivalid JWT token: " + e.getMessage());
 		} catch (ExpiredJwtException e) {
-			throw new TokenException("Token is expired");
-//			logger.error("JWT token is expired: {}" + e.getMessage());
+			logger.error("JWT token is expired: " + e.getMessage());
+			throw new TokenException("token is expired");
 		} catch (UnsupportedJwtException e) {
-			logger.error("JWT token is unsupported: {}" + e.getMessage());
+			logger.error("JWT token is unsupported: " + e.getMessage());
 		} catch(IllegalArgumentException e) {
-			logger.error("JWT claims string is empty: {}" + e.getMessage());
+			logger.error("JWT claims string is empty: " + e.getMessage());
 		}
 		
 		return false;
@@ -84,9 +84,6 @@ public class JwtUtils {
 		  String[] headerAuth = request.getHeader("Authorization").split(" ");
 		  String token = headerAuth[1];
 		  
-		  if(!this.validateJwtToken(token)) {
-			  throw new TokenException("test");
-		  }
 		  var email = this.getUserNameFromJwtToken(token);
 		  
 		  Optional<User> user = userRepository.findByEmail(email);

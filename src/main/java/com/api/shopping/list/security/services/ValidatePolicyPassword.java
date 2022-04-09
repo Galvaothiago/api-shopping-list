@@ -21,7 +21,6 @@ public class ValidatePolicyPassword {
 	
 	private List<String> listRulesViolated = new ArrayList<>();
 	
-	
 	public ValidatePolicyPassword(String password) {
 		this.password = password;
 	}
@@ -41,7 +40,6 @@ public class ValidatePolicyPassword {
 		if(!this.validate()) {
 			for(String message : violationMessages) {
 				listRulesViolated.add(message);
-				System.out.println(message);
 			}
 		}
 	}
@@ -69,14 +67,12 @@ public class ValidatePolicyPassword {
 				//the false parameter indicates that wrapped sequences are allowed; e.g. 'xyzabc'
 				new IllegalSequenceRule(EnglishSequenceData.Alphabetical, 3, false),
 				new IllegalSequenceRule(EnglishSequenceData.Numerical, 3, false),
-				new IllegalSequenceRule(EnglishSequenceData.USQwerty, 5, false),
 				
 				//no whitespace
 				new WhitespaceRule());
 		
 		return validator;
 	}
-
 
 	public List<String> getListRulesViolated() {
 		return listRulesViolated;

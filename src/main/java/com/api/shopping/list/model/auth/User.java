@@ -53,9 +53,6 @@ public class User implements Serializable {
 			inverseJoinColumns = @JoinColumn(name = "role_id"))
 	private Set<Role> roles = new HashSet<>();
 	
-//	@OneToMany(mappedBy = "user")
-//	private List<Purchase> purchase = new ArrayList<>();
-	
 	public User() {
 		
 	}

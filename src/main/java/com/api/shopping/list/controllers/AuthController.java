@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.api.shopping.list.exceptions.TokenException;
 import com.api.shopping.list.model.auth.ERole;
 import com.api.shopping.list.model.auth.RefreshToken;
 import com.api.shopping.list.model.auth.Role;
@@ -32,7 +31,6 @@ import com.api.shopping.list.payload.request.TokenRefreshRequest;
 import com.api.shopping.list.payload.response.JwtResponse;
 import com.api.shopping.list.payload.response.MessageResponse;
 import com.api.shopping.list.payload.response.exception.InvalidPasswordPolicyResponse;
-import com.api.shopping.list.payload.response.exception.TokenExceptionResponse;
 import com.api.shopping.list.repositories.RoleRepository;
 import com.api.shopping.list.repositories.UserRepository;
 import com.api.shopping.list.security.exceptions.TokenRefreshException;
@@ -73,6 +71,8 @@ public class AuthController {
 		String jwt = jwtUtils.generateJwtToken(authentication);
 		
 		UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+		
+		System.out.println(authentication.isAuthenticated());
 		
 		List<String> roles = userDetails.getAuthorities().stream()
 				.map(item -> item.getAuthority())

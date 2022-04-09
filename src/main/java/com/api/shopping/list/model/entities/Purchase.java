@@ -19,7 +19,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.Valid;
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.PositiveOrZero;
 import javax.validation.constraints.Size;
 
@@ -27,7 +26,6 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import com.api.shopping.list.model.auth.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
 @Table(name = "purchases")
@@ -46,6 +44,8 @@ public class Purchase implements Serializable {
 	
 	@PositiveOrZero
 	private Double totalPrice = 0.00D;
+	
+	private String marketName;
 	
 	@JsonIgnore
 	@ManyToOne
@@ -109,6 +109,14 @@ public class Purchase implements Serializable {
 
 	public void setTotalPrice(Double totalPrice) {
 		this.totalPrice = totalPrice;
+	}
+	
+	public String getMarketName() {
+		return marketName;
+	}
+	
+	public void setMarketName(String marketName) {
+		this.marketName = marketName;
 	}
 
 	public User getUser() {

@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -17,12 +18,10 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.api.shopping.list.exceptions.TokenException;
+import com.api.shopping.list.security.exceptions.TokenException;
 import com.api.shopping.list.security.services.UserDetailsServiceImpl;
 
-import io.jsonwebtoken.ExpiredJwtException;
-
-public class AuthTokenFilter extends OncePerRequestFilter{
+public class AuthTokenFilter extends OncePerRequestFilter {
 	@Autowired
 	private JwtUtils jwtUtils;
 	
@@ -34,7 +33,7 @@ public class AuthTokenFilter extends OncePerRequestFilter{
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-			throws ServletException, IOException{
+			throws ServletException, IOException {
 
 		try {
 			String jwt = parseJwt(request);
@@ -51,18 +50,21 @@ public class AuthTokenFilter extends OncePerRequestFilter{
 				SecurityContextHolder.getContext().setAuthentication(authentication);
 				
 			}
-		} catch (Exception e) {
-			if(e.getMessage().contentEquals("Token is expired")) {
-				throw new TokenException("Token is expired");
-			}
-			System.out.println(e.getMessage());
-//			throw new TokenException("sdsd");
+			
+			filterChain.doFilter(request, response);
+			
+		} catch (TokenException e) {
+			response.setContentType("application/json");
+		    response.setStatus(HttpStatus.UNAUTHORIZED.value());
+		    response.getOutputStream().println("{ \"error\": \"" + e.getMessage() + "\" }");
+		    
 			logger.error("Cannot set user authentication: " + e.getMessage());
-		} 
-		
-		filterChain.doFilter(request, response);
-
+			
+		} catch(Exception e) {
+			logger.error("Cannot set user authentication: " + e.getMessage());
+		}
 	}
+	
 	
 	private String parseJwt(HttpServletRequest request) {
 		String headerAuth = request.getHeader("Authorization");

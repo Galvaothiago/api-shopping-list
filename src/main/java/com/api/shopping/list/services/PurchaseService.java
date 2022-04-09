@@ -7,7 +7,6 @@ import java.util.Optional;
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
 import com.api.shopping.list.exceptions.PurchaseItemNotExistsException;
@@ -97,7 +96,7 @@ public class PurchaseService {
 	}
 	
 	@Transactional
-	public void finalizePurchase(Long id, Double value, User user) {
+	public void finalizePurchase(Long id, Double value, User user, String marketName) {
 		try {
 			
 			Optional<Purchase> purchaseOptional = repository.findById(id);
@@ -111,6 +110,8 @@ public class PurchaseService {
 			
 			purchase.setTotalPrice(value);
 			purchase.setStatus(EStatus.FINISHED);
+			
+			if(marketName != null) purchase.setMarketName(marketName);
 			
 			repository.save(purchase);
 			
