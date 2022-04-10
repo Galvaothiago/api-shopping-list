@@ -2,23 +2,24 @@ package com.api.shopping.list.model.entities;
 
 import java.io.Serializable;
 import java.time.Instant;
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
-import javax.persistence.CollectionTable;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
-import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import javax.validation.Valid;
 import javax.validation.constraints.PositiveOrZero;
 import javax.validation.constraints.Size;
 
@@ -56,19 +57,21 @@ public class Purchase implements Serializable {
 	@Column(length = 25)
 	private EStatus status = EStatus.CREATED;
 
-	@Valid
-	@ElementCollection
-	@CollectionTable(name = "purchases_items", joinColumns = @JoinColumn(name = "purchase_id"))
-	private List<String> items = new ArrayList<>();
+//	@Valid
+//	@ElementCollection
+//	@CollectionTable(name = "purchases_items", joinColumns = @JoinColumn(name = "purchase_id"))
+//	private List<String> items = new ArrayList<>();
+	
+	@OneToMany(mappedBy = "purchase", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	private Set<Item> items  = new HashSet<>();
 	
 	public Purchase() {
 		
 	}
 	
-	public Purchase(Long id, String title, List<String> items) {
+	public Purchase(Long id, String title) {
 		this.id = id;
 		this.title = title;
-		this.items = items;
 	}
 
 	public Long getId() {
@@ -127,11 +130,11 @@ public class Purchase implements Serializable {
 		this.user = user;
 	}
 
-	public List<String> getItems() {
+	public Set<Item> getItems() {
 		return items;
 	}
 
-	public void setItems(List<String> items) {
+	public void setItems(Set<Item> items) {
 		this.items = items;
 	}
 

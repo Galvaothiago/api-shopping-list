@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.api.shopping.list.model.auth.User;
 import com.api.shopping.list.model.entities.Purchase;
+import com.api.shopping.list.payload.request.PurchaseItem;
 import com.api.shopping.list.payload.response.MessageResponse;
 import com.api.shopping.list.security.jwt.JwtUtils;
 import com.api.shopping.list.services.PurchaseService;
@@ -75,9 +76,9 @@ public class PurchaseController {
 	}
 	
 	@PutMapping(value = "/items/{id}")
-	public ResponseEntity<Purchase> saveItemIntoPurchase(@Valid @PathVariable Long id, @RequestBody List<String> items, HttpServletRequest request) {
+	public ResponseEntity<Purchase> saveItemIntoPurchase(@Valid @PathVariable Long id, @RequestBody PurchaseItem purchaseItems, HttpServletRequest request) {
 		User user = jwtUtils.getUserByToken(request);
-		Purchase updatedPurchase = service.insertItems(id, items, user);			
+		Purchase updatedPurchase = service.insertItems(id, purchaseItems, user);			
 		
 		if(updatedPurchase == null) ResponseEntity.notFound();
 		

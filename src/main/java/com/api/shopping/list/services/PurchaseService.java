@@ -1,8 +1,10 @@
 package com.api.shopping.list.services;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.Set;
 
 import javax.transaction.Transactional;
 
@@ -14,7 +16,10 @@ import com.api.shopping.list.exceptions.PurchaseNotFoundException;
 import com.api.shopping.list.exceptions.PurchaseUnmatchedUserException;
 import com.api.shopping.list.model.auth.User;
 import com.api.shopping.list.model.entities.EStatus;
+import com.api.shopping.list.model.entities.Item;
 import com.api.shopping.list.model.entities.Purchase;
+import com.api.shopping.list.payload.request.PurchaseItem;
+import com.api.shopping.list.repositories.ItemPurchaseRepository;
 import com.api.shopping.list.repositories.PurchaseRepository;
 
 @Service
@@ -22,6 +27,9 @@ public class PurchaseService {
 	
 	@Autowired
 	PurchaseRepository repository;
+	
+	@Autowired
+	ItemPurchaseRepository itemRepository;
 	
 	public List<Purchase> getAllPurchase(User user) {
 		List<Purchase> purchases = repository.findAllPurchaseByUser(user.getId());
@@ -72,11 +80,6 @@ public class PurchaseService {
 				throw new PurchaseUnmatchedUserException("This item does not belong to your purchase");
 			}
 			
-			List<String> items = purchase.get().getItems();
-			
-			int index = items.indexOf(toRemove);
-			items.remove(index);
-			
 			repository.save(purchase.get());
 			
 		} catch(IndexOutOfBoundsException e) {
@@ -122,7 +125,13 @@ public class PurchaseService {
 		}
 	}
 	
-	public Purchase insertItems(Long id, List<String> items, User user) {
+	public List<String> getItemsFromPurchase(Long id) {
+		List<String> itemsPurchase = itemRepository.getItemsFromPurchase(id);
+		
+		return itemsPurchase;
+	}
+	
+	public Purchase insertItems(Long id, PurchaseItem items, User user) {
 		try {
 			Optional<Purchase> purchase = repository.findById(id);
 			Purchase entity = purchase.get();
@@ -133,13 +142,21 @@ public class PurchaseService {
 				throw new PurchaseUnmatchedUserException("This item does not belong to your purchase");
 			}
 			
+			Set<Item> ListItems = new HashSet<>();
+			
+			
+			for(String item : items.getItems()) {
+				ListItems.add(new Item(item, entity));
+			}
+		
+			
 			if(entity.getItems().isEmpty()) {
-				entity.setItems(items);
+				entity.setItems(ListItems);
 				
 				return repository.save(entity);
 			} 
-				
-			for(String item : items) {
+			
+			for(Item item : ListItems) {
 				entity.getItems().add(item);
 			}
 				

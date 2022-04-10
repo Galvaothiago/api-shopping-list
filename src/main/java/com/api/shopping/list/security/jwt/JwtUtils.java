@@ -81,10 +81,14 @@ public class JwtUtils {
 	}
 	
 	public User getUserByToken(HttpServletRequest request) {
+		
+		if(!request.getHeader("Authorization").startsWith("Bearer ")) {
+			return null;
+		}
 		  String[] headerAuth = request.getHeader("Authorization").split(" ");
 		  String token = headerAuth[1];
 		  
-		  var email = this.getUserNameFromJwtToken(token);
+		  String email = this.getUserNameFromJwtToken(token);
 		  
 		  Optional<User> user = userRepository.findByEmail(email);
 		  
