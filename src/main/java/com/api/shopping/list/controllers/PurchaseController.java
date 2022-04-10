@@ -21,6 +21,7 @@ import com.api.shopping.list.model.auth.User;
 import com.api.shopping.list.model.entities.Purchase;
 import com.api.shopping.list.payload.request.PurchaseItem;
 import com.api.shopping.list.payload.response.MessageResponse;
+import com.api.shopping.list.payload.response.PurchaseItemResponse;
 import com.api.shopping.list.security.jwt.JwtUtils;
 import com.api.shopping.list.services.PurchaseService;
 
@@ -55,14 +56,13 @@ public class PurchaseController {
 	}
 	
 	@GetMapping(value = "/{id}")
-	public ResponseEntity<Purchase> getById(@PathVariable Long id, HttpServletRequest request) {
+	public ResponseEntity<PurchaseItemResponse> getById(@PathVariable Long id, HttpServletRequest request) {
 		User user = jwtUtils.getUserByToken(request);
 		
-		Purchase purchase = service.findById(id, user);
+		PurchaseItemResponse purchase = service.findById(id, user);
 		
 		if(purchase == null) ResponseEntity.notFound();
 		
-		System.out.println(purchase);
 		return ResponseEntity.ok().body(purchase);
 	}
 	

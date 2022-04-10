@@ -62,6 +62,8 @@ public class testConfig implements CommandLineRunner{
 		purchase3.setUser(user2);
 		purchase4.setUser(user);
 		
+		purchase.setItems(items);
+		
 		repository.saveAll(Arrays.asList(purchase, purchase2, purchase3, purchase4));
 	}
 

@@ -2,10 +2,9 @@ package com.api.shopping.list.model.entities;
 
 import java.io.Serializable;
 import java.time.Instant;
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -56,14 +55,10 @@ public class Purchase implements Serializable {
 	@Enumerated(EnumType.STRING)
 	@Column(length = 25)
 	private EStatus status = EStatus.CREATED;
-
-//	@Valid
-//	@ElementCollection
-//	@CollectionTable(name = "purchases_items", joinColumns = @JoinColumn(name = "purchase_id"))
-//	private List<String> items = new ArrayList<>();
 	
-	@OneToMany(mappedBy = "purchase", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-	private Set<Item> items  = new HashSet<>();
+	@JsonIgnore
+	@OneToMany(mappedBy = "purchase", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	private List<Item> items  = new ArrayList<>();
 	
 	public Purchase() {
 		
@@ -78,7 +73,7 @@ public class Purchase implements Serializable {
 		return id;
 	}
 
-	public void setId(Long id) {
+	public void settId(Long id) {
 		this.id = id;
 	}
 
@@ -130,11 +125,11 @@ public class Purchase implements Serializable {
 		this.user = user;
 	}
 
-	public Set<Item> getItems() {
+	public List<Item> getItems() {
 		return items;
 	}
 
-	public void setItems(Set<Item> items) {
+	public void setItems(List<Item> items) {
 		this.items = items;
 	}
 

@@ -1,10 +1,9 @@
 package com.api.shopping.list.services;
 
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
-import java.util.Set;
 
 import javax.transaction.Transactional;
 
@@ -19,6 +18,7 @@ import com.api.shopping.list.model.entities.EStatus;
 import com.api.shopping.list.model.entities.Item;
 import com.api.shopping.list.model.entities.Purchase;
 import com.api.shopping.list.payload.request.PurchaseItem;
+import com.api.shopping.list.payload.response.PurchaseItemResponse;
 import com.api.shopping.list.repositories.ItemPurchaseRepository;
 import com.api.shopping.list.repositories.PurchaseRepository;
 
@@ -44,14 +44,30 @@ public class PurchaseService {
 		return result;
 	}
 	
-	public Purchase findById(Long id, User user) {
+	public PurchaseItemResponse findById(Long id, User user) {
 		Optional<Purchase> result = repository.findById(id);
 		
 		boolean isYourPurchase = user.equals(result.get().getUser());
 		
-		if(result.isPresent() && isYourPurchase) {
-			return result.get();
+		if(!isYourPurchase) {
+			throw new PurchaseUnmatchedUserException("This item does not belong to your purchase");
 		}
+		
+		if(result.isPresent() && isYourPurchase) {
+			PurchaseItemResponse purchase = new PurchaseItemResponse();
+			
+			Purchase originalPurchase = result.get();
+			purchase.setId(originalPurchase.getId());
+			purchase.setTitle(originalPurchase.getTitle());
+			purchase.setCreatedAt(originalPurchase.getCreatedAt());
+			purchase.setTotalPrice(originalPurchase.getTotalPrice());
+			purchase.setMarketName(originalPurchase.getMarketName());
+			purchase.setStatus(originalPurchase.getStatus());
+			purchase.setItems(originalPurchase.getItems());
+			
+			return purchase;
+		}
+		
 		
 		return null;
 	}
@@ -142,7 +158,7 @@ public class PurchaseService {
 				throw new PurchaseUnmatchedUserException("This item does not belong to your purchase");
 			}
 			
-			Set<Item> ListItems = new HashSet<>();
+			List<Item> ListItems = new ArrayList<>();
 			
 			
 			for(String item : items.getItems()) {
